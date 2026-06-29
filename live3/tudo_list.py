@@ -8,7 +8,7 @@ cursor.execute("""
                    CREATE TABLE IF NOT EXISTS tarefa (
                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                    titulo TEXT NOT NULL,
-                   concluida INTEGER DEFAULT 0 
+                   feita INTEGER DEFAULT 0 
                )
                
                """)
@@ -38,13 +38,40 @@ def listar():
         
 def concluir():
     listar()
-    id_digitado = input ('Escolha um ID da tarefa para concluir: ')
-    cursor.execute ('SELECT * FROM tarefa WHERE id = ?', (id_digitado,))
+    id_digitado = input('Escolha um ID da tarefa para concluir: ')
+
+    cursor.execute('SELECT * FROM tarefa WHERE id = ?', (id_digitado,))
     tarefa = cursor.fetchall()
-    print (tarefa)
+
+    if tarefa == []:
+        print('Tarefa não encontrada!!')
+        return
+   
+    cursor.execute(
+            'UPDATE tarefa SET feita = 1 WHERE id = ?',
+            (id_digitado,)
+        )
+    conn.commit()
+    print('Tarefa atualizada com sucesso!')
     
-  
-       
+def deletar():
+    listar()
+
+    id_digitado = input('Digite o ID da tarefa para deletar: ')
+
+    cursor.execute('SELECT * FROM tarefa WHERE id = ?', (id_digitado,))
+    tarefa = cursor.fetchall()
+
+    if tarefa == []:
+        print('Tarefa não encontrada!!')
+        return
+
+    cursor.execute('DELETE FROM tarefa WHERE id = ?', (id_digitado,))
+    conn.commit()
+
+    print('Tarefa removida com sucesso!')
+    
+      
 def menu():
     while True:
         print("\n===== TUDO LIST =====")
@@ -63,7 +90,7 @@ def menu():
         elif opcao == '3':
             concluir()
         elif opcao == '4':
-            print("Deletando itens...")
+            deletar()
         elif opcao == '0':
             print("Saindo do sistema.")
             break
